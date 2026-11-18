@@ -7,21 +7,23 @@ name = "recpack"
 version = "0.3.6"
 description = "Python package for Top-N recommendation based on implicit feedback data."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
+# Lower bounds for scipy, scikit-learn, pandas and torch are their first releases built against numpy 2.
+# tqdm >= 4.66.1 is needed for progress_map with pandas >= 2.2.
 dependencies = [
-    "numpy>=1.21.2, ==1.*",
-    "scipy>=1.6.0, ==1.*",
-    "scikit-learn>=1.1.1, ==1.*",
-    "pandas>=2.1.4, ==2.*",
+    "numpy>=2.0, ==2.*",
+    "scipy>=1.13, ==1.*",
+    "scikit-learn>=1.4.2, ==1.*",
+    "pandas>=2.2.2, ==2.*",
     "PyYAML>=6.0.1, ==6.*",
-    "torch>=2.1.1, ==2.*",
-    "tqdm>=4.46.0, ==4.*",
+    "torch>=2.3, ==2.*",
+    "tqdm>=4.66.1, ==4.*",
     "hyperopt>=0.3.0, ==0.3.*",
 ]
 
 [project.optional-dependencies]
 doc = ["sphinx==4.*", "sphinx-rtd-theme==1.*"]
-test = ["pytest>=6.2.4, ==6.*", "pytest-cov>=2.12.1, ==2.*"]
+test = ["pytest>=8.0", "pytest-cov>=5.0"]
 
 [project.urls]
 Homepage = "https://gitlab.com/recpack-maintainers/recpack"
@@ -45,7 +47,7 @@ include = ["/recpack", "/README.md", "/LICENSE", "/CHANGELOG.md"]
 
 [tool.black]
 line-length = 119
-target-version = ['py310']
+target-version = ['py311']
 include = '\.pyi?$'
 exclude = '''
 
