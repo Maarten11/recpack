@@ -45,7 +45,9 @@ def test_check_prediction():
         # Trigger a warning.
         a._check_prediction(X_pred, X)
 
-    with pytest.warns(None):
+    # No warning expected: pytest.warns(None) was removed in pytest 8.
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
         a._check_prediction(X, X)
 
 
