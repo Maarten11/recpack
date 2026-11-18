@@ -1,6 +1,51 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "recpack"
+version = "0.3.6"
+description = "Python package for Top-N recommendation based on implicit feedback data."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.21.2, ==1.*",
+    "scipy>=1.6.0, ==1.*",
+    "scikit-learn>=1.1.1, ==1.*",
+    "pandas>=2.1.4, ==2.*",
+    "PyYAML>=6.0.1, ==6.*",
+    "torch>=2.1.1, ==2.*",
+    "tqdm>=4.46.0, ==4.*",
+    "hyperopt>=0.3.0, ==0.3.*",
+]
+
+[project.optional-dependencies]
+doc = ["sphinx==4.*", "sphinx-rtd-theme==1.*"]
+test = ["pytest>=6.2.4, ==6.*", "pytest-cov>=2.12.1, ==2.*"]
+
+[project.urls]
+Homepage = "https://gitlab.com/recpack-maintainers/recpack"
+Documentation = "https://recpack.froomle.ai"
+
+[tool.hatch.build.targets.wheel]
+packages = ["recpack"]
+# Keep the wheel identical to the former setuptools build, which only shipped
+# directories containing an __init__.py.
+exclude = [
+    "recpack/tests/test_algorithms/test_experimental",
+    "recpack/tests/test_algorithms/test_time_aware_item_knn",
+    "recpack/tests/test_datasets",
+    "recpack/tests/test_metrics",
+    "recpack/tests/test_pipelines",
+    "recpack/tests/test_scenarios",
+]
+
+[tool.hatch.build.targets.sdist]
+include = ["/recpack", "/README.md", "/LICENSE", "/CHANGELOG.md"]
+
 [tool.black]
 line-length = 119
-target-version = ['py39']
+target-version = ['py310']
 include = '\.pyi?$'
 exclude = '''
 
