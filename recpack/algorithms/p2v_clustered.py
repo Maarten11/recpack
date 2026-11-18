@@ -204,7 +204,7 @@ class Prod2VecClustered(Prod2Vec):
         # Compute similarities per cluster
         for cluster in np.arange(self.num_clusters):
             # Get clusters that occur after `cluster` often.
-            cluster_neighbours = cluster_to_cluster_neighbours[cluster, :].nonzero()[1]
+            cluster_neighbours = cluster_to_cluster_neighbours[[cluster], :].nonzero()[1]
 
             if not cluster_neighbours.any():
                 continue

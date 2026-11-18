@@ -21,7 +21,7 @@ def unigram_distribution(X: csr_matrix) -> np.ndarray:
     the noise distribution is taken to be the unigram distribution to the power (3/4).
     Note: this is a heuristic based on the original Word2Vec paper.
     """
-    item_counts_powered = np.power(X.sum(axis=0).A[0], 3 / 4)
+    item_counts_powered = np.power(np.asarray(X.sum(axis=0)).ravel(), 3 / 4)
     return item_counts_powered / item_counts_powered.sum()
 
 

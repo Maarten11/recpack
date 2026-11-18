@@ -116,7 +116,8 @@ class STAN(Algorithm):
         self.sessions_ = X
         session_interactions_timestamps = X.last_timestamps_matrix
         self.session_interactions_positions_ = timestamp_matrix_to_position(session_interactions_timestamps)
-        self.historical_session_timestamps_ = session_interactions_timestamps.max(axis=1)  # |U| x 1 matrix
+        # |U| x 1 matrix
+        self.historical_session_timestamps_ = session_interactions_timestamps.max(axis=1).reshape(-1, 1)
 
     def _predict(self, X: InteractionMatrix) -> csr_matrix:
         timestamp_matrix = X.last_timestamps_matrix
@@ -166,9 +167,9 @@ class STAN(Algorithm):
         #   <a, b> / sqrt(|a| * |b|)
 
         session_similarity = weighted_sessions @ self.sessions_.binary_values.T
-        denominator_part_1 = session_ranks.max(axis=1)
+        denominator_part_1 = session_ranks.max(axis=1).reshape(-1, 1)
         denominator_part_1.data = 1 / np.sqrt(denominator_part_1.data)
-        denominator_part_2 = self.session_interactions_positions_.max(axis=1)
+        denominator_part_2 = self.session_interactions_positions_.max(axis=1).reshape(-1, 1)
         denominator_part_2.data = 1 / np.sqrt(denominator_part_2.data)
 
         session_similarity = session_similarity.multiply(denominator_part_1).multiply(denominator_part_2.T)
@@ -189,7 +190,7 @@ class STAN(Algorithm):
         :return: [description]
         :rtype: csr_matrix
         """
-        sessions_last_timestamp = session_timestamps.max(axis=1)
+        sessions_last_timestamp = session_timestamps.max(axis=1).reshape(-1, 1)
 
         # To compute - t(s) - t(s_j) i.e. t(s_j) - t(s)
         # only for those sessions that are actually similar,
@@ -227,9 +228,9 @@ class STAN(Algorithm):
         results = lil_matrix(X.shape)
         binary_history = X.binary_values
         for session in X.active_users:
-            history = binary_history[session, :]
+            history = binary_history[[session], :]
             # get the similarity between the session and training sessions.
-            neighborhood_scores = session_similarity[session, :].toarray()
+            neighborhood_scores = session_similarity[[session], :].toarray()
 
             # Get the positions of visits in the neighborhood sessions
             neighborhood_positions = lil_matrix(
@@ -238,7 +239,7 @@ class STAN(Algorithm):
 
             # Find the last matching position with each neighbour session
             matching_positions = neighborhood_positions.multiply(history)
-            last_match = matching_positions.max(axis=1)
+            last_match = matching_positions.max(axis=1).reshape(-1, 1)
 
             # Compute the weight for each item in the matching neighbours
             # The last matching neighbour gets a final weight of 0,

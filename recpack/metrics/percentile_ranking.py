@@ -78,7 +78,7 @@ class PercentileRanking(Metric):
         # This means they are randomly distributed in the group of all 0 scores,
         # but we use the expected value rather than giving each a random rank
         # to improve computation speed.
-        max_rank_per_user = rank_values.max(axis=1)
+        max_rank_per_user = rank_values.max(axis=1).reshape(-1, 1)
 
         rank_for_misses_per_user = csr_matrix((max_rank_per_user.toarray() + 1) / 2)
 

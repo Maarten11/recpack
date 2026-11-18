@@ -48,7 +48,7 @@ class PrecisionK(ListwiseMetricK):
 
         scores = scores.tocsr()
 
-        self.scores_ = csr_matrix(scores.sum(axis=1)) / self.K
+        self.scores_ = csr_matrix(np.asarray(scores.sum(axis=1)).reshape(-1, 1)) / self.K
 
         return
 

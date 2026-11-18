@@ -268,13 +268,13 @@ class TARSItemKNNCoocDistance(TARSItemKNN):
 
         # Loop over all items as centers
         for i in tqdm(range(num_items)):
-            n_center_occ = (last_timestamps_matrix[:, i] > 0).sum()
+            n_center_occ = (last_timestamps_matrix[:, [i]] > 0).sum()
             if n_center_occ == 0:  # Unvisited item, no neighbours
                 continue
 
             # Compute |t_i - t_j| for each j cooccurring with item i
-            cooc_ts = last_timestamps_matrix.multiply(last_timestamps_matrix[:, i] > 0)
-            distance = cooc_ts - (cooc_ts > 0).multiply(last_timestamps_matrix[:, i])
+            cooc_ts = last_timestamps_matrix.multiply(last_timestamps_matrix[:, [i]] > 0)
+            distance = cooc_ts - (cooc_ts > 0).multiply(last_timestamps_matrix[:, [i]])
             distance.data = np.abs(distance.data)
 
             # Decay the distances
@@ -282,7 +282,7 @@ class TARSItemKNNCoocDistance(TARSItemKNN):
             # and we only give it values per user.
             distance.data = decay_func(distance.data)
 
-            similarities = csr_matrix(distance.sum(axis=0))
+            similarities = csr_matrix(np.asarray(distance.sum(axis=0)).reshape(1, -1))
             # Normalisation options.
             if self.similarity == "conditional_probability":
                 similarities = similarities.multiply(1 / n_center_occ)

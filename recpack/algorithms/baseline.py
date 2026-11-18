@@ -94,7 +94,7 @@ class Popularity(Algorithm):
 
     def _fit(self, X: csr_matrix) -> "Popularity":
         # Get popularity score for every item
-        interaction_counts = X.sum(axis=0).A[0]
+        interaction_counts = np.asarray(X.sum(axis=0)).ravel()
         sorted_scores = interaction_counts / interaction_counts.max()
 
         num_items = X.shape[1]

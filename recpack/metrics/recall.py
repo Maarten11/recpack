@@ -43,7 +43,8 @@ class RecallK(ListwiseMetricK):
 
         scores = scores.tocsr()
 
-        self.scores_ = csr_matrix(sparse_divide_nonzero(scores, csr_matrix(y_true.sum(axis=1))).sum(axis=1))
+        num_true = csr_matrix(np.asarray(y_true.sum(axis=1)).reshape(-1, 1))
+        self.scores_ = csr_matrix(np.asarray(sparse_divide_nonzero(scores, num_true).sum(axis=1)).reshape(-1, 1))
 
         return
 
@@ -80,9 +81,9 @@ class CalibratedRecallK(ListwiseMetricK):
         scores[y_pred_top_K.multiply(y_true).astype(bool)] = 1
         scores = scores.tocsr()
 
-        optimal = csr_matrix(np.minimum(y_true.sum(axis=1), self.K))
+        optimal = csr_matrix(np.minimum(np.asarray(y_true.sum(axis=1)).reshape(-1, 1), self.K))
 
-        self.scores_ = csr_matrix(sparse_divide_nonzero(scores, optimal).sum(axis=1))
+        self.scores_ = csr_matrix(np.asarray(sparse_divide_nonzero(scores, optimal).sum(axis=1)).reshape(-1, 1))
 
 
 def calibrated_recall_k(y_true, y_pred, k):

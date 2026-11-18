@@ -5,6 +5,7 @@
 #   Lien Michiels
 #   Robin Verachtert
 
+import numpy as np
 from scipy.sparse import csr_matrix, lil_matrix
 
 from recpack.algorithms.base import TopKItemSimilarityMatrixAlgorithm
@@ -71,5 +72,5 @@ class SequentialRules(TopKItemSimilarityMatrixAlgorithm):
         # by dividing with the amount of occurrences of the left hand side item.
         # We also only keep the K highest values.
         self.similarity_matrix_ = get_top_K_values(
-            csr_matrix(similarities.multiply(invert(X.binary_values.sum(axis=0).T))), self.K
+            csr_matrix(similarities.multiply(invert(np.asarray(X.binary_values.sum(axis=0)).reshape(-1, 1)))), self.K
         )

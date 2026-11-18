@@ -72,22 +72,22 @@ class TARSItemKNNHermann(TopKItemSimilarityMatrixAlgorithm):
 
         # Loop over all items as centers
         for i in tqdm(range(num_items)):
-            n_center_occ = (last_timestamps_matrix[:, i] > 0).sum()
+            n_center_occ = (last_timestamps_matrix[:, [i]] > 0).sum()
             if n_center_occ == 0:  # Unvisited item, no neighbours
                 continue
 
             # Compute |t_i - t_j| for each j cooccurring with item i
-            cooc_ts = last_timestamps_matrix.multiply(last_timestamps_matrix[:, i] > 0)
-            distance = cooc_ts - (cooc_ts > 0).multiply(last_timestamps_matrix[:, i])
+            cooc_ts = last_timestamps_matrix.multiply(last_timestamps_matrix[:, [i]] > 0)
+            distance = cooc_ts - (cooc_ts > 0).multiply(last_timestamps_matrix[:, [i]])
             distance.data = np.abs(distance.data)
 
             # Add min age of i and j to the distance computed.
 
-            broadcasted_age_of_center = (last_timestamps_matrix > 0).multiply(last_timestamps_matrix[:, i])
+            broadcasted_age_of_center = (last_timestamps_matrix > 0).multiply(last_timestamps_matrix[:, [i]])
             target_has_smallest_age = last_timestamps_matrix < broadcasted_age_of_center
             center_has_smallest_age = (cooc_ts > 0) - target_has_smallest_age
             min_age = target_has_smallest_age.multiply(last_timestamps_matrix) + center_has_smallest_age.multiply(
-                last_timestamps_matrix[:, i]
+                last_timestamps_matrix[:, [i]]
             )
             min_age.data = now - min_age.data
             distance = distance + (distance > 0).multiply(min_age)
@@ -95,8 +95,8 @@ class TARSItemKNNHermann(TopKItemSimilarityMatrixAlgorithm):
             # Decay the distances
             distance.data = self.fit_decay_func(distance.data)
 
-            similarities = csr_matrix(distance.sum(axis=0))
-            n_cooc = (cooc_ts > 0).sum(axis=0)
+            similarities = csr_matrix(np.asarray(distance.sum(axis=0)).reshape(1, -1))
+            n_cooc = np.asarray((cooc_ts > 0).sum(axis=0)).reshape(1, -1)
             similarities = similarities.multiply(invert(n_cooc))
             self.similarity_matrix_[i] = get_top_K_values(csr_matrix(similarities), self.K)
 

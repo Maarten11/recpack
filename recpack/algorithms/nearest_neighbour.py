@@ -48,7 +48,7 @@ def compute_conditional_probability(X: csr_matrix, pop_discount: float = 0) -> c
     co_mat = to_binary(X).T @ X
 
     # Compute the inverse of the item frequencies
-    A = invert(diags(to_binary(X).sum(axis=0).A[0]).tocsr())
+    A = invert(diags(np.asarray(to_binary(X).sum(axis=0)).ravel()).tocsr())
 
     if pop_discount:
         # This has all item similarities
@@ -99,9 +99,9 @@ def compute_pearson_similarity(X: csr_matrix) -> csr_matrix:
     if (X == 1).sum() == X.nnz:
         raise ValueError("Pearson similarity can not be computed on a binary matrix.")
 
-    count_per_item = (X > 0).sum(axis=0).A
+    count_per_item = np.asarray((X > 0).sum(axis=0)).reshape(1, -1)
 
-    avg_per_item = X.sum(axis=0).A.astype(float)
+    avg_per_item = np.asarray(X.sum(axis=0)).reshape(1, -1).astype(float)
 
     avg_per_item[count_per_item > 0] = avg_per_item[count_per_item > 0] / count_per_item[count_per_item > 0]
 

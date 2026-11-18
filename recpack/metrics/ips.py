@@ -59,7 +59,7 @@ class IPSMetric(FittedMetric):
         :type X: scipy.sparse.csr_matrix
         """
         # Compute vector with propensities
-        self.item_prob_ = X.sum(axis=0) / X.sum()
+        self.item_prob_ = np.asarray(X.sum(axis=0)).reshape(1, -1) / X.sum()
         self.inverse_propensities = 1 / self.item_prob_
         self.inverse_propensities[self.inverse_propensities == np.inf] = 0
 

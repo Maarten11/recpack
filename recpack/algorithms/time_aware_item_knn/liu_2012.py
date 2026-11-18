@@ -95,7 +95,7 @@ class TARSItemKNNLiu2012(TARSItemKNN):
         timestamp_mat = X.last_timestamps_matrix
 
         first_user_interactions = X.binary_values.multiply(self._compute_users_first_interaction(X))
-        last_user_interactions = X.binary_values.multiply(timestamp_mat.max(axis=1))
+        last_user_interactions = X.binary_values.multiply(timestamp_mat.max(axis=1).reshape(-1, 1))
         # the input for the decay is (t - t0_u) / tl_u
         # Where t0_u is the users first interaction and tl_u the last
         timestamp_mat.data = LiuDecay(self.decay)(

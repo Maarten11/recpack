@@ -289,8 +289,8 @@ def warp_loss_wrapper(
             negatives_batch.reshape(current_batch_size * num_negatives, 1).squeeze(-1).numpy().tolist(),
         ]
 
-        dist_pos_interaction = torch.tensor(dist_pos_interaction.A[0]).unsqueeze(-1)
-        dist_neg_interaction_flat = torch.tensor(dist_neg_interaction.A[0])
+        dist_pos_interaction = torch.tensor(np.asarray(dist_pos_interaction).ravel()).unsqueeze(-1)
+        dist_neg_interaction_flat = torch.tensor(np.asarray(dist_neg_interaction).ravel())
         dist_neg_interaction = dist_neg_interaction_flat.reshape(current_batch_size, -1)
 
         losses.append(warp_loss(dist_pos_interaction, dist_neg_interaction, margin, num_items, num_negatives))

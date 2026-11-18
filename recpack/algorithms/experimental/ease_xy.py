@@ -75,7 +75,7 @@ class EASE_XY(EASE):
         G = XTX + self.l2 * np.identity(X.shape[1])
 
         P = np.linalg.inv(G)
-        B_rr = P @ (X.T @ y).todense()
+        B_rr = P @ (X.T @ y).toarray()
 
         D = np.diag(np.diag(B_rr) / np.diag(P))
         B = B_rr - P @ D

@@ -42,4 +42,4 @@ class ReciprocalRankK(ListwiseMetricK):
         # Invert hit ranks
         inverse_ranks = sparse_inverse_nonzero(hits)
         # per user compute the max inverted rank of a hit
-        self.scores_ = inverse_ranks.max(axis=1)
+        self.scores_ = inverse_ranks.max(axis=1).reshape(-1, 1)

@@ -47,7 +47,7 @@ class IntraListDiversityK(FittedMetric, ListwiseMetricK):
         self.X = X
 
     def _get_distance(self, i, j):
-        return distance.jaccard(self.X[i].toarray()[0], self.X[j].toarray()[0])
+        return distance.jaccard(self.X[[i], :].toarray()[0], self.X[[j], :].toarray()[0])
 
     def _get_ild(self, recommended_items):
         # Compute the ILD for this list
@@ -73,7 +73,7 @@ class IntraListDiversityK(FittedMetric, ListwiseMetricK):
         scores = csr_matrix(np.zeros((y_pred_top_K.shape[0], 1)))
 
         for u in range(0, y_pred_top_K.shape[0]):
-            recommended_items = list(set(y_pred_top_K[u, :].nonzero()[1]))
+            recommended_items = list(set(y_pred_top_K[[u], :].nonzero()[1]))
             if len(recommended_items) == 0:
                 continue
 

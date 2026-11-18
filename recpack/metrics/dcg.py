@@ -47,7 +47,7 @@ class DCGK(ListwiseMetricK):
 
         dcg = sparse_divide_nonzero(numerator, denominator)
 
-        self.scores_ = csr_matrix(dcg.sum(axis=1))
+        self.scores_ = csr_matrix(np.asarray(dcg.sum(axis=1)).reshape(-1, 1))
 
         return
 
@@ -115,9 +115,9 @@ class NDCGK(ListwiseMetricK):
 
         dcg = sparse_divide_nonzero(numerator, denominator)
 
-        per_user_dcg = dcg.sum(axis=1)
+        per_user_dcg = np.asarray(dcg.sum(axis=1)).reshape(-1, 1)
 
-        hist_len = y_true.sum(axis=1).astype(np.int32)
+        hist_len = np.asarray(y_true.sum(axis=1)).reshape(-1, 1).astype(np.int32)
         hist_len[hist_len > self.K] = self.K
 
         self.scores_ = sparse_divide_nonzero(
