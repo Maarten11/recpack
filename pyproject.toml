@@ -40,6 +40,8 @@ exclude = [
     "recpack/tests/test_metrics",
     "recpack/tests/test_pipelines",
     "recpack/tests/test_scenarios",
+    # Test data for the snapshot tests, only needed when running them from a checkout.
+    "recpack/tests/test_regression/snapshots.npz",
 ]
 
 [tool.hatch.build.targets.sdist]
