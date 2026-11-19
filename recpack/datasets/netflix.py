@@ -101,7 +101,7 @@ class Netflix(Dataset):
             first_line = g.readline().decode("utf-8")
             # Rest is comma-eparated with columns user, rating, date
             df = pd.read_csv(
-                g, names=[self.USER_IX, self.RATING_IX, "date"], parse_dates=["date"], infer_datetime_format=True
+                g, names=[self.USER_IX, self.RATING_IX, "date"], parse_dates=["date"]
             )
             df[self.ITEM_IX] = first_line[:-2]
             # Translate the date to a timestamp

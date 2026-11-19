@@ -504,7 +504,8 @@ class InteractionMatrix:
         :rtype: List[Tuple[int, List[int]]]
         """
         for uid, user_history in self._df.groupby(self.USER_IX):
-            yield (uid, user_history[InteractionMatrix.INTERACTION_IX].values)
+            # Copy: with pandas >= 3 (copy-on-write) .values is a read-only view.
+            yield (uid, user_history[InteractionMatrix.INTERACTION_IX].to_numpy(copy=True))
 
     @property
     def sorted_interaction_history(self) -> Iterator[Tuple[int, List[int]]]:

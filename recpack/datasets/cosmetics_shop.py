@@ -127,7 +127,8 @@ class CosmeticsShop(Dataset):
                 with zip_ref.open(item, 'r') as f:
                     df = pd.read_csv(f, parse_dates=[self.TIMESTAMP_IX],usecols=self._columns)
                     # Transform timestamp to seconds since epoch
-                    df.loc[:, self.TIMESTAMP_IX] = df[self.TIMESTAMP_IX].view(int) / 1e9
+                    # pandas >= 3 parses to microsecond resolution, so convert to ns first.
+                    df[self.TIMESTAMP_IX] = df[self.TIMESTAMP_IX].dt.as_unit("ns").astype("int64") / 1e9
                     # Select only the specified event_types
                     if self.event_types:
                         df = df[df[self.EVENT_TYPE_IX].isin(self.event_types)].copy()

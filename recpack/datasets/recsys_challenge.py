@@ -96,6 +96,7 @@ class RecsysChallenge2015(Dataset):
         # Adapt timestamp, this makes it so the timestamp is always seconds since epoch
         # Newer pandas versions apply the explicit str dtype after parse_dates, leaving strings, so parse explicitly.
         df[self.TIMESTAMP_IX] = pd.to_datetime(df[self.TIMESTAMP_IX], format="ISO8601")
-        df[self.TIMESTAMP_IX] = df[self.TIMESTAMP_IX].astype(int) / 1e9  # pandas datetime -> seconds from epoch
+        # pandas >= 3 parses to microsecond resolution, so convert to ns first.
+        df[self.TIMESTAMP_IX] = df[self.TIMESTAMP_IX].dt.as_unit("ns").astype("int64") / 1e9  # seconds from epoch
 
         return df
