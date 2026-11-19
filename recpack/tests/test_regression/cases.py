@@ -12,16 +12,22 @@ Outputs are converted to dense arrays, so the comparison does not depend on the 
 type (``csr_matrix``, ``csr_array``, ``np.matrix``, ...), only on the values.
 """
 
+import os
+import shutil
+import tempfile
+from functools import partial
 from typing import Callable, Dict
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
 import torch
-from scipy.sparse import csr_matrix, issparse
+from scipy.sparse import csr_array, csr_matrix, issparse
 
-from recpack import algorithms, metrics, scenarios
+from recpack import algorithms, datasets, metrics, scenarios
 from recpack.algorithms.experimental import DAMIBCover, EASE_XY
 from recpack.matrix import InteractionMatrix
+from recpack.matrix.util import Matrix
 from recpack.postprocessing.filters import ExcludeItems, SelectItems
 
 NUM_USERS = 60
@@ -32,6 +38,10 @@ NUM_DAYS = 30
 SEED = 42
 
 Outputs = Dict[str, np.ndarray]
+
+# Inputs are built with the sparse type the installed RecPack works with,
+# so the same cases run on RecPack < 0.4 (csr_matrix) to generate the snapshots.
+SPARSE = csr_array if csr_array in Matrix.__args__ else csr_matrix
 
 
 def make_data() -> InteractionMatrix:
@@ -61,7 +71,7 @@ def make_scores() -> csr_matrix:
     rng = np.random.default_rng(SEED + 1)
     scores = rng.random((NUM_USERS, NUM_ITEMS))
     mask = rng.random((NUM_USERS, NUM_ITEMS)) < 0.3
-    return csr_matrix(scores * mask)
+    return SPARSE(scores * mask)
 
 
 def to_array(x) -> np.ndarray:
@@ -232,6 +242,73 @@ def run_postprocessing() -> Outputs:
     }
 
 
+# --- Datasets ---------------------------------------------------------------------------
+
+DATASET_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "test_datasets", "datasets")
+
+# Default filters are used where the small test samples survive them.
+LOCAL_DATASETS: Dict[str, Callable[[str], datasets.Dataset]] = {
+    "CiteULike": lambda path: datasets.CiteULike(path=path, filename="citeulike_sample.dat"),
+    "MovieLens100K": lambda path: datasets.MovieLens100K(path=path, filename="ml-100k_sample.data"),
+    "MovieLens1M": lambda path: datasets.MovieLens1M(path=path, filename="ml-1m_sample.dat"),
+    "MovieLens10M": lambda path: datasets.MovieLens10M(path=path, filename="ml-10m_sample.dat"),
+    "MovieLens25M": lambda path: datasets.MovieLens25M(path=path, filename="ml-25m_sample.csv"),
+    "MillionSongDataset": lambda path: datasets.MillionSongDataset(
+        path=path, filename="msd_train_triplets_sample.csv", use_default_filters=False
+    ),
+    "TasteProfile": lambda path: datasets.TasteProfile(
+        path=path, filename="msd_train_triplets_sample.csv", use_default_filters=False
+    ),
+    "RecsysChallenge2015": lambda path: datasets.RecsysChallenge2015(path=path, filename="yoochoose-clicks.dat"),
+    "RetailRocket": lambda path: datasets.RetailRocket(
+        path=path, filename="retailrocket-sample.csv", use_default_filters=False
+    ),
+    "CosmeticsShop": lambda path: datasets.CosmeticsShop(
+        path=path, filename="cosmeticsshop-sample.zip", use_default_filters=False
+    ),
+    "Globo": lambda path: datasets.Globo(path=path, filename="globo-sample.zip"),
+}
+
+# Datasets that unpack a downloaded archive: (module, archive in test_datasets/datasets/compressed).
+DOWNLOADED_DATASETS = {
+    "Netflix": ("netflix", "nf_prize_dataset.tar.gz", lambda path: datasets.Netflix(path=path)),
+    "AdressaOneWeek": (
+        "adressa",
+        "one_week.tar.gz",
+        lambda path: datasets.AdressaOneWeek(path, "adressa_views.csv", use_default_filters=False),
+    ),
+}
+
+
+def interaction_matrix_outputs(im: InteractionMatrix) -> Outputs:
+    columns = [c for c in (im.USER_IX, im.ITEM_IX, im.TIMESTAMP_IX) if c in im._df.columns]
+    df = im._df[columns].sort_values(columns)
+    return {"interactions": df.to_numpy(dtype=float), "shape": np.array(im.shape, dtype=float)}
+
+
+def run_dataset(name: str) -> Outputs:
+    # Work in a temporary copy, loading may write files next to the data.
+    with tempfile.TemporaryDirectory() as path:
+        if name in LOCAL_DATASETS:
+            dataset = LOCAL_DATASETS[name](path)
+            shutil.copyfile(os.path.join(DATASET_DIR, dataset.filename), dataset.file_path)
+            return interaction_matrix_outputs(dataset.load())
+
+        module, archive, make = DOWNLOADED_DATASETS[name]
+
+        def mock_download(url, file_path):
+            shutil.copyfile(os.path.join(DATASET_DIR, "compressed", archive), file_path)
+
+        with patch(f"recpack.datasets.{module}._fetch_remote", partial(mock_download)):
+            dataset = make(path)
+            dataset.fetch_dataset(force=True)
+            return interaction_matrix_outputs(dataset.load())
+
+
+def run_dummy_dataset() -> Outputs:
+    return interaction_matrix_outputs(datasets.DummyDataset(seed=SEED).load())
+
+
 # --- All cases --------------------------------------------------------------------------
 
 CASES: Dict[str, Callable[[], Outputs]] = {
@@ -240,4 +317,6 @@ CASES: Dict[str, Callable[[], Outputs]] = {
     **{f"scenario/{n}": (lambda n=n: run_scenario(n)) for n in SCENARIOS},
     "matrix/InteractionMatrix": run_interaction_matrix,
     "postprocessing/filters": run_postprocessing,
+    **{f"dataset/{n}": (lambda n=n: run_dataset(n)) for n in [*LOCAL_DATASETS, *DOWNLOADED_DATASETS]},
+    "dataset/DummyDataset": run_dummy_dataset,
 }
