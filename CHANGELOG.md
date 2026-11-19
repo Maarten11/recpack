@@ -7,6 +7,60 @@ _Maintainer | Robin Verachtert | robin.verachtert@froomle.com_
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - ![](https://img.shields.io/date/1795089600.svg?label=2026-11-19)
+
+This release modernises RecPack's dependencies and moves to the array-based APIs of numpy and scipy.
+It contains several breaking changes; see "Migrating from 0.3" below.
+
+### Breaking changes
+* __Sparse arrays instead of sparse matrices__: RecPack now uses scipy's sparse arrays (`csr_array`, `lil_array`, ...)
+  instead of sparse matrices (`csr_matrix`, ...).
+    * `InteractionMatrix.values`, `binary_values` and `last_timestamps_matrix`, `Algorithm.predict`
+      and similarity matrices return `csr_array`; metric `scores_` are sparse arrays.
+    * Algorithms only accept an `InteractionMatrix` or a `csr_array` as input.
+      Passing a `csr_matrix` raises `UnsupportedTypeError`; convert it with `scipy.sparse.csr_array(X)`.
+    * The `Matrix` type is now `Union[InteractionMatrix, csr_array]`.
+    * `IPSMetric.item_prob_` is a 2D `np.ndarray` instead of an `np.matrix`.
+* __Python and dependencies__: requires Python >= 3.12, numpy >= 2.2, scipy >= 1.15, pandas >= 3.0,
+  scikit-learn >= 1.6, torch >= 2.6 and hyperopt >= 0.3.
+  Minimum versions follow [SPEC 0](https://scientific-python.org/specs/spec-0000/).
+* `InteractionMatrix.interaction_history` yields numpy arrays that are copies (writable), also with pandas 3.
+
+### Migrating from 0.3
+Sparse arrays behave like numpy arrays rather than like `np.matrix`. In code that uses RecPack's outputs,
+or in your own algorithms (`_fit`, `_predict`):
+* `X * Y` is element-wise for sparse arrays; use `X @ Y` for matrix multiplication.
+* `X.sum(axis=0)` returns a 1D `np.ndarray` instead of a `(1, n)` `np.matrix`.
+  Remove `.A1` / `.A`, and use `[:, None]` or `.reshape(-1, 1)` where you need a column.
+* `X[i]` returns a 1D sparse array, so `X[i].nonzero()` has only one element.
+  Use `X[[i]]` (or `X[[i], :]`) to keep a 2D row.
+* `X ** 2` is element-wise, not a matrix power.
+* Replace `scipy.sparse.diags` / `eye` / `identity` with `diags_array` / `eye_array`,
+  which return sparse arrays.
+
+### Dependencies
+* Packaging moved from `setup.py` to `pyproject.toml` with the `hatchling` build backend.
+* `requirements.txt` pins a known-good environment.
+* hyperopt 0.3 (removes the `pkg_resources` dependency).
+* Supports numpy 2, pandas 3 and Python 3.12 to 3.15.
+
+### Bugfixes
+* __datasets__
+    * `CosmeticsShop` and `RecsysChallenge2015`: timestamps are converted correctly with pandas 3,
+      which parses dates to microseconds instead of nanoseconds.
+    * `RecsysChallenge2015`: timestamps with and without fractional seconds are parsed explicitly.
+* __algorithms__
+    * Top-K selection (`get_top_K_values`) breaks ties deterministically, as documented:
+      ties for the last position go to the largest column index.
+    * `Prod2VecClustered` sets `KMeans(n_init=10)` explicitly; scikit-learn 1.4 changed the default.
+    * Torch models are loaded with `torch.load(weights_only=False)`; torch 2.6 changed the default.
+
+### Development
+* CI moved from GitLab CI to GitHub Actions and runs on pull requests.
+* The default branch is renamed from `master` to `main`.
+* Added snapshot tests (`recpack/tests/test_regression/`) that compare the outputs of all algorithms, metrics,
+  scenarios and dataset loaders with stored reference outputs.
+
 ## [0.3.6] - ![](https://img.shields.io/date/1702314586.svg?label=2023-12-1)
 
 ## Dependencies

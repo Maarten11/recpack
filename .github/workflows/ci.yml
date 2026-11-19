@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  # Only test PRs; merges to master are not re-tested. Use "Run workflow" for a manual run.
+  # Only test PRs; merges to main are not re-tested. Use "Run workflow" for a manual run.
   pull_request:
   workflow_dispatch:
 
