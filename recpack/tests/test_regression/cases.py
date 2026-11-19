@@ -119,9 +119,7 @@ ALGORITHMS: Dict[str, Callable[[], algorithms.Algorithm]] = {
     "EASE_XY": lambda: EASE_XY(l2=10.0),
     # Torch based algorithms: few epochs, small models, fixed seed.
     "BPRMF": lambda: algorithms.BPRMF(num_components=8, batch_size=64, **TORCH_KWARGS),
-    "MultVAE": lambda: algorithms.MultVAE(
-        batch_size=16, dim_bottleneck_layer=8, dim_hidden_layer=16, **TORCH_KWARGS
-    ),
+    "MultVAE": lambda: algorithms.MultVAE(batch_size=16, dim_bottleneck_layer=8, dim_hidden_layer=16, **TORCH_KWARGS),
     "RecVAE": lambda: algorithms.RecVAE(batch_size=16, dim_bottleneck_layer=8, dim_hidden_layer=16, **TORCH_KWARGS),
     "Prod2Vec": lambda: algorithms.Prod2Vec(num_components=8, K=K, batch_size=64, **TORCH_KWARGS),
     "Prod2VecClustered": lambda: algorithms.Prod2VecClustered(

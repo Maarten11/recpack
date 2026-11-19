@@ -18,7 +18,7 @@ from recpack.matrix.util import (
     UnsupportedTypeError,
 )
 from recpack.matrix import InteractionMatrix, to_csr_matrix
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_array
 
 
 USER_IX = InteractionMatrix.USER_IX
@@ -353,13 +353,13 @@ def test_from_csr_matrix(data):
 @pytest.fixture
 def m_csr():
     m = [[1, 1, 0, 0], [0, 1, 2, 0], [0, 0, 0, 0]]
-    return csr_matrix(m, dtype=np.int32)
+    return csr_array(m, dtype=np.int32)
 
 
 @pytest.fixture
 def m_csr_binary():
     m = [[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 0, 0]]
-    return csr_matrix(m, dtype=np.int32)
+    return csr_array(m, dtype=np.int32)
 
 
 @pytest.fixture
@@ -381,13 +381,13 @@ def matrix_equal(a, b):
 
 
 def test_to_csr_matrix_csr(m_csr):
-    # csr_matrix -> csr_matrix
+    # csr_array -> csr_array
     result = to_csr_matrix(m_csr)
     assert result is m_csr
 
 
 def test_to_csr_matrix_interaction_matrix(m_csr, m_datam):
-    # InteractionMatrix -> csr_matrix
+    # InteractionMatrix -> csr_array
     result = to_csr_matrix(m_datam)
     assert matrix_equal(result, m_csr)
 
@@ -414,7 +414,7 @@ def test_to_csr_matrix_unsupported_type():
 
 
 def test_to_binary_csr(m_csr, m_datam, m_csr_binary):
-    # csr_matrix -> csr_matrix
+    # csr_array -> csr_array
     result = to_csr_matrix(m_csr, binary=True)
     assert matrix_equal(result, m_csr_binary)
     assert result.dtype == m_csr.dtype
@@ -423,7 +423,7 @@ def test_to_binary_csr(m_csr, m_datam, m_csr_binary):
 
 
 def test_to_binary_csr2(m_csr, m_datam, m_csr_binary):
-    # InteractionMatrix -> csr_matrix
+    # InteractionMatrix -> csr_array
     result = to_csr_matrix(m_datam, binary=True)
     assert matrix_equal(result, m_csr_binary)
 

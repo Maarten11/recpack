@@ -7,7 +7,7 @@
 
 import numpy as np
 from numpy.typing import ArrayLike
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_array
 
 from recpack.algorithms.time_aware_item_knn.base import TARSItemKNN
 from recpack.algorithms.time_aware_item_knn.decay_functions import DecayFunction
@@ -82,7 +82,7 @@ class TARSItemKNNLiu2012(TARSItemKNN):
         super().__init__(K=K, fit_decay=decay, predict_decay=decay, decay_function="liu", similarity="cosine")
         self.decay = decay
 
-    def _add_decay_to_interaction_matrix(self, X: InteractionMatrix, decay: float) -> csr_matrix:
+    def _add_decay_to_interaction_matrix(self, X: InteractionMatrix, decay: float) -> csr_array:
         """Weight the interaction matrix based on age of the events.
 
         :param X: Interaction matrix.
@@ -90,7 +90,7 @@ class TARSItemKNNLiu2012(TARSItemKNN):
         :param decay: decay parameter, is 1/half_life
         :type decay: float
         :return: Weighted csr matrix.
-        :rtype: csr_matrix
+        :rtype: csr_array
         """
         timestamp_mat = X.last_timestamps_matrix
 
@@ -101,7 +101,7 @@ class TARSItemKNNLiu2012(TARSItemKNN):
         timestamp_mat.data = LiuDecay(self.decay)(
             (timestamp_mat.data - first_user_interactions.data) / last_user_interactions.data
         )
-        return csr_matrix(timestamp_mat)
+        return csr_array(timestamp_mat)
 
     def _compute_users_first_interaction(self, X: InteractionMatrix) -> np.array:
         """Compute the launch time of each item as the first time it was interacted with.

@@ -6,7 +6,7 @@
 #   Robin Verachtert
 
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_array
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -184,8 +184,8 @@ def bpr_loss(positive_sim: torch.Tensor, negative_sim: torch.Tensor) -> torch.Te
 
 
 def bpr_loss_wrapper(
-    X_true: csr_matrix,
-    X_pred: csr_matrix,
+    X_true: csr_array,
+    X_pred: csr_array,
     batch_size=1000,
     sample_size=None,
     exact=False,
@@ -200,9 +200,9 @@ def bpr_loss_wrapper(
     :func:`bpr_loss` function.
 
     :param X_true: The expected interactions for the users
-    :type X_true: csr_matrix
+    :type X_true: csr_array
     :param X_pred: The predicted scores for users
-    :type X_pred: csr_matrix
+    :type X_pred: csr_array
     :param batch_size: size of the batches to sample, defaults to 1000
     :type batch_size: int, optional
     :param sample_size: How many samples to construct
@@ -239,8 +239,8 @@ def bpr_loss_wrapper(
 
 
 def warp_loss_wrapper(
-    X_true: csr_matrix,
-    X_pred: csr_matrix,
+    X_true: csr_array,
+    X_pred: csr_array,
     batch_size: int = 1000,
     num_negatives: int = 20,
     margin: float = 1.9,
@@ -254,9 +254,9 @@ def warp_loss_wrapper(
     Their scores are fetched from the X_pred matrix.
 
     :param X_true: True interactions expected for the users
-    :type X_true: csr_matrix
+    :type X_true: csr_array
     :param X_pred: Predicted scores.
-    :type X_pred: csr_matrix
+    :type X_pred: csr_array
     :param batch_size: Size of the sample batches, defaults to 1000
     :type batch_size: int, optional
     :param num_negatives: How many negatives to sample for each positive item, defaults to 20

@@ -7,7 +7,7 @@
 
 import numpy as np
 from scipy.spatial import distance
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_array
 
 from recpack.metrics.base import FittedMetric, ListwiseMetricK
 from recpack.util import get_top_K_ranks
@@ -36,13 +36,13 @@ class IntraListDiversityK(FittedMetric, ListwiseMetricK):
         self.X = None
         self.results_per_list = []
 
-    def fit(self, X: csr_matrix) -> None:
+    def fit(self, X: csr_array) -> None:
         """
         Fit a item-feature matrix that is used to determine the diversity of the list
         of Top-K recommendations. 
 
         :param X: Item-feature matrix.
-        :type X: csr_matrix
+        :type X: csr_array
         """
         self.X = X
 
@@ -67,10 +67,10 @@ class IntraListDiversityK(FittedMetric, ListwiseMetricK):
         ild = (2 / (len(recommended_items) * (len(recommended_items) - 1))) * t_distance
         return ild
 
-    def _calculate(self, y_true: csr_matrix, y_pred_top_K: csr_matrix) -> None:
+    def _calculate(self, y_true: csr_array, y_pred_top_K: csr_array) -> None:
         """Compute the diversity of the predicted user preferences."""
 
-        scores = csr_matrix(np.zeros((y_pred_top_K.shape[0], 1)))
+        scores = csr_array(np.zeros((y_pred_top_K.shape[0], 1)))
 
         for u in range(0, y_pred_top_K.shape[0]):
             recommended_items = list(set(y_pred_top_K[[u], :].nonzero()[1]))

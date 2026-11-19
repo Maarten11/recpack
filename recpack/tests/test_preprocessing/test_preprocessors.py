@@ -249,19 +249,19 @@ def test_session_dataframe_preprocessor_sunny_day(dataframe_with_fixed_timestamp
     # User 1 has 2 sessions, all other users have a single one.
     assert interaction_m.shape[0] == dataframe_with_fixed_timestamps[InteractionMatrix.USER_IX].nunique() + 1
 
-    session_interaction_counts = interaction_m.values.sum(axis=1).T
+    session_interaction_counts = interaction_m.values.sum(axis=1)
 
-    session_interaction_counts[0, 0] == 5
-    session_interaction_counts[0, 1] == 4
-    session_interaction_counts[0, 2] == 3
-    session_interaction_counts[0, 3] == 3
-    session_interaction_counts[0, 4] == 2
-    session_interaction_counts[0, 5] == 3
+    session_interaction_counts[0] == 5
+    session_interaction_counts[1] == 4
+    session_interaction_counts[2] == 3
+    session_interaction_counts[3] == 3
+    session_interaction_counts[4] == 2
+    session_interaction_counts[5] == 3
 
     # Check that order is as expected
-    session_unique_interaction_counts = interaction_m.binary_values.sum(axis=1).T
-    session_unique_interaction_counts[0, 2] == 1
-    session_unique_interaction_counts[0, 5] == 1
+    session_unique_interaction_counts = interaction_m.binary_values.sum(axis=1)
+    session_unique_interaction_counts[2] == 1
+    session_unique_interaction_counts[5] == 1
 
     first_session_id, first_session = next(interaction_m.sorted_item_history)
     assert first_session_id == 0

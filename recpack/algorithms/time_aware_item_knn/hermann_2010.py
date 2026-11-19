@@ -6,7 +6,7 @@
 #   Robin Verachtert
 
 import numpy as np
-from scipy.sparse import csr_matrix, lil_matrix
+from scipy.sparse import csr_array, lil_array
 from tqdm.auto import tqdm
 
 from recpack.algorithms.base import TopKItemSimilarityMatrixAlgorithm
@@ -68,7 +68,7 @@ class TARSItemKNNHermann(TopKItemSimilarityMatrixAlgorithm):
         last_timestamps_matrix = X.last_timestamps_matrix / self.decay_interval
         now = last_timestamps_matrix.max() + 1 / self.decay_interval
 
-        self.similarity_matrix_ = lil_matrix((X.shape[1], X.shape[1]))
+        self.similarity_matrix_ = lil_array((X.shape[1], X.shape[1]))
 
         # Loop over all items as centers
         for i in tqdm(range(num_items)):
@@ -95,9 +95,9 @@ class TARSItemKNNHermann(TopKItemSimilarityMatrixAlgorithm):
             # Decay the distances
             distance.data = self.fit_decay_func(distance.data)
 
-            similarities = csr_matrix(np.asarray(distance.sum(axis=0)).reshape(1, -1))
+            similarities = csr_array(np.asarray(distance.sum(axis=0)).reshape(1, -1))
             n_cooc = np.asarray((cooc_ts > 0).sum(axis=0)).reshape(1, -1)
             similarities = similarities.multiply(invert(n_cooc))
-            self.similarity_matrix_[i] = get_top_K_values(csr_matrix(similarities), self.K)
+            self.similarity_matrix_[i] = get_top_K_values(csr_array(similarities), self.K)
 
         self.similarity_matrix_ = self.similarity_matrix_.tocsr()

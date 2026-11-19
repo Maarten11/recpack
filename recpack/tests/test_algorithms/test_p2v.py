@@ -12,7 +12,7 @@ from unittest.mock import MagicMock
 import pytest
 import numpy as np
 import pandas as pd
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_array
 
 from recpack.algorithms.p2v import Prod2Vec, window
 from recpack.matrix import InteractionMatrix
@@ -50,7 +50,7 @@ def prod2vec(p2v_embedding, mat):
 
 @pytest.fixture(scope="module")
 def diagonal_interaction_matrix() -> InteractionMatrix:
-    matrix = csr_matrix((6, 5))
+    matrix = csr_array((6, 5))
     matrix[[0, 1, 2, 3, 4], [0, 1, 2, 3, 4]] = 1
 
     return InteractionMatrix.from_csr_matrix(matrix)
@@ -150,7 +150,7 @@ def test_create_similarity_matrix_no_self_similarity(prod2vec, diagonal_interact
     ],
 )
 def test_create_similarity_matrix_no_similarities_from_inactive_items(prod2vec, active_items, inactive_items):
-    matrix = csr_matrix((6, 5))
+    matrix = csr_array((6, 5))
     matrix[active_items, active_items] = 1
 
     prod2vec._create_similarity_matrix(InteractionMatrix.from_csr_matrix(matrix))
@@ -169,7 +169,7 @@ def test_create_similarity_matrix_no_similarities_from_inactive_items(prod2vec, 
     ],
 )
 def test_create_similarity_matrix_no_similarities_to_inactive_items(prod2vec, active_items, inactive_items):
-    matrix = csr_matrix((6, 5))
+    matrix = csr_array((6, 5))
     matrix[active_items, active_items] = 1
 
     prod2vec._create_similarity_matrix(InteractionMatrix.from_csr_matrix(matrix))
@@ -180,7 +180,7 @@ def test_create_similarity_matrix_no_similarities_to_inactive_items(prod2vec, ac
 
 def test_batch_predict(prod2vec):
     # Rewrite with different matrix
-    matrix = csr_matrix((6, 5))
+    matrix = csr_array((6, 5))
     matrix[[0, 1, 2, 3, 4], [0, 1, 2, 3, 4]] = 1
 
     prod2vec._create_similarity_matrix(InteractionMatrix.from_csr_matrix(matrix))
