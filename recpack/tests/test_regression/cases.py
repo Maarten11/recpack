@@ -88,7 +88,8 @@ K = 10
 TORCH_KWARGS = dict(max_epochs=2, seed=SEED, stop_early=False)
 
 ALGORITHMS: Dict[str, Callable[[], algorithms.Algorithm]] = {
-    "Popularity": lambda: algorithms.Popularity(K=K),
+    # K=11: at K=10 two items tie for the last place, which Popularity breaks differently per platform.
+    "Popularity": lambda: algorithms.Popularity(K=11),
     "Random": lambda: algorithms.Random(K=K, seed=SEED),
     "NMF": lambda: algorithms.NMF(num_components=8, seed=SEED),
     "SVD": lambda: algorithms.SVD(num_components=8, seed=SEED),
