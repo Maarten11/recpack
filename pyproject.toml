@@ -7,17 +7,18 @@ name = "recpack"
 version = "0.3.6"
 description = "Python package for Top-N recommendation based on implicit feedback data."
 readme = "README.md"
-requires-python = ">=3.11"
-# Lower bounds for scipy, scikit-learn, pandas and torch are their first releases built against numpy 2.
-# tqdm >= 4.66.1 is needed for progress_map with pandas >= 2.2.
+requires-python = ">=3.12"
+# Lower bounds follow SPEC 0 (https://scientific-python.org/specs/spec-0000/): dependency releases
+# from the last 2 years. Python is kept at >= 3.12 (security fixes until Oct 2028).
+# scipy >= 1.15 is also the first release that supports indexing sparse arrays to 1D (X[i]).
 dependencies = [
-    "numpy>=2.0, ==2.*",
-    "scipy>=1.13, ==1.*",
-    "scikit-learn>=1.4.2, ==1.*",
+    "numpy>=2.2, ==2.*",
+    "scipy>=1.15, ==1.*",
+    "scikit-learn>=1.6, ==1.*",
     "pandas>=2.2.2, ==2.*",
-    "PyYAML>=6.0.1, ==6.*",
-    "torch>=2.3, ==2.*",
-    "tqdm>=4.66.1, ==4.*",
+    "PyYAML>=6.0.2, ==6.*",
+    "torch>=2.6, ==2.*",
+    "tqdm>=4.67, ==4.*",
     "hyperopt>=0.3.0, ==0.3.*",
 ]
 
@@ -49,7 +50,7 @@ include = ["/recpack", "/README.md", "/LICENSE", "/CHANGELOG.md"]
 
 [tool.black]
 line-length = 119
-target-version = ['py311']
+target-version = ['py312']
 include = '\.pyi?$'
 exclude = '''
 

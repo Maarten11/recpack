@@ -48,7 +48,7 @@ def compute_conditional_probability(X: csr_array, pop_discount: float = 0) -> cs
     co_mat = to_binary(X).T @ X
 
     # Compute the inverse of the item frequencies
-    A = invert(diags_array(np.asarray(to_binary(X).sum(axis=0)).ravel()).tocsr())
+    A = invert(diags_array(np.asarray(to_binary(X).sum(axis=0)).ravel(), dtype=float).tocsr())
 
     if pop_discount:
         # This has all item similarities
