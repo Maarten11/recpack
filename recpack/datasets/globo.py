@@ -108,7 +108,7 @@ class Globo(Dataset):
                         continue
                     else:
                         # Timestamp from miliseconds sinds epoch to seconds since epoch
-                        df[self.TIMESTAMP_IX] = df[self.TIMESTAMP_IX].view(int) / 1e3
+                        df[self.TIMESTAMP_IX] = df[self.TIMESTAMP_IX].astype("int64") / 1e3
 
                         dfs.append(df)
 

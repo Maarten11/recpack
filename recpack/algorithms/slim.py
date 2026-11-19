@@ -62,7 +62,9 @@ class SLIM(ItemSimilarityMatrixAlgorithm):
 
     def _compute_similarities(self, work_matrix, item):
         new_matrix = work_matrix.tocoo()
-        target = new_matrix.getcol(item)
+        # scikit-learn only accepts sparse inputs with 32-bit indices.
+        new_matrix.coords = tuple(c.astype(np.int32) for c in new_matrix.coords)
+        target = work_matrix[:, [item]]
         data_indices = np.where(new_matrix.col == item)[0]
         new_matrix.data[data_indices] = 0
         self.model.fit(new_matrix, target.toarray().ravel())
@@ -98,4 +100,4 @@ class SLIM(ItemSimilarityMatrixAlgorithm):
 
         # Construct similarity matrix.
         # Shape is determined by 2nd dimension of the shape of input matrix X
-        self.similarity_matrix_ = scipy.sparse.csr_matrix((data, (row, col)), shape=(X.shape[1], X.shape[1]))
+        self.similarity_matrix_ = scipy.sparse.csr_array((data, (row, col)), shape=(X.shape[1], X.shape[1]))

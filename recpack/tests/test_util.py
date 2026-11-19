@@ -55,7 +55,7 @@ def test_get_top_K_values(data_knn):
         [0.3, 0.2, 0.3, 0.5],
     )
 
-    topK = scipy.sparse.csr_matrix(
+    topK = scipy.sparse.csr_array(
         (topK_values, (topK_users, topK_items)), shape=(10, 5)
     )
 

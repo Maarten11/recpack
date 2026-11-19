@@ -11,7 +11,7 @@ import numpy as np
 
 from recpack.algorithms.base import ItemSimilarityMatrixAlgorithm
 from recpack.matrix import Matrix, to_csr_matrix
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_array
 
 
 @enum.unique
@@ -56,7 +56,7 @@ class DAMIBCover(ItemSimilarityMatrixAlgorithm):
         predictions = get_predictions(X, self.similarity_matrix_, self.p, self.agg)
 
         self._check_prediction(predictions, X)
-        return csr_matrix(predictions)
+        return csr_array(predictions)
 
 
 def get_predictions(X, M, p, agg):
@@ -64,7 +64,7 @@ def get_predictions(X, M, p, agg):
     # For every user
     for u in set(X.nonzero()[0]):
         # Items this user has interacted with [0, 1, 0] -> indices = 2
-        indices = X[u].toarray()[0]
+        indices = X[[u], :].toarray()[0]
         # [[0 1], [1 0]] (sim) * [0 2] (u)
         similarities = M[indices.astype(bool), :].toarray()
         predictions[u] = get_prediction_u(similarities, p, agg)

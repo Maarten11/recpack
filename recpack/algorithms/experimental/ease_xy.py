@@ -26,11 +26,11 @@ class EASE_XY(EASE):
     **Example of use**::
 
         import numpy as np
-        from scipy.sparse import csr_matrix
+        from scipy.sparse import csr_array
         from recpack.algorithms import EASE_XY
 
-        X = csr_matrix(np.array([[1, 0, 1], [1, 0, 1], [1, 1, 1]]))
-        y = csr_matrix(np.array([[0, 0, 1], [0, 0, 1], [1, 0, 0]]))
+        X = csr_array(np.array([[1, 0, 1], [1, 0, 1], [1, 1, 1]]))
+        y = csr_array(np.array([[0, 0, 1], [0, 0, 1], [1, 0, 0]]))
 
         algo = EASE_XY()
         # Fit algorithm
@@ -75,7 +75,7 @@ class EASE_XY(EASE):
         G = XTX + self.l2 * np.identity(X.shape[1])
 
         P = np.linalg.inv(G)
-        B_rr = P @ (X.T @ y).todense()
+        B_rr = P @ (X.T @ y).toarray()
 
         D = np.diag(np.diag(B_rr) / np.diag(P))
         B = B_rr - P @ D
@@ -84,7 +84,7 @@ class EASE_XY(EASE):
             w = 1 / np.diag(XTX.toarray()) ** self.alpha
             B = B @ np.diag(w)
 
-        self.similarity_matrix_ = scipy.sparse.csr_matrix(B)
+        self.similarity_matrix_ = scipy.sparse.csr_array(B)
 
         if self.density:
             self._prune()

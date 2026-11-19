@@ -5,7 +5,7 @@
 #   Lien Michiels
 #   Robin Verachtert
 
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_array
 
 from recpack.metrics.base import Metric
 from recpack.util import get_top_K_ranks
@@ -47,7 +47,7 @@ class PercentileRanking(Metric):
     def __init__(self):
         super().__init__()
 
-    def _calculate(self, y_true: csr_matrix, y_pred: csr_matrix) -> None:
+    def _calculate(self, y_true: csr_array, y_pred: csr_array) -> None:
         """Calculate the percentile ranking score for the particular
         ``y_true`` and ``y_pred`` matrices.
 
@@ -78,9 +78,9 @@ class PercentileRanking(Metric):
         # This means they are randomly distributed in the group of all 0 scores,
         # but we use the expected value rather than giving each a random rank
         # to improve computation speed.
-        max_rank_per_user = rank_values.max(axis=1)
+        max_rank_per_user = rank_values.max(axis=1).reshape(-1, 1)
 
-        rank_for_misses_per_user = csr_matrix((max_rank_per_user.toarray() + 1) / 2)
+        rank_for_misses_per_user = csr_array((max_rank_per_user.toarray() + 1) / 2)
 
         # Add the average rank for all non matches.
         pure_hit = y_true.multiply(y_pred)

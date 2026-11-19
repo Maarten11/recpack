@@ -89,7 +89,7 @@ class EASE(ItemSimilarityMatrixAlgorithm):
             w = 1 / np.diag(XTX) ** self.alpha
             B = B @ np.diag(w)
 
-        self.similarity_matrix_ = scipy.sparse.csr_matrix(B)
+        self.similarity_matrix_ = scipy.sparse.csr_array(B)
 
         if self.density:
             self._prune()
