@@ -7,6 +7,32 @@ _Maintainer | Robin Verachtert | robin.verachtert@froomle.com_
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.7] - ![](https://img.shields.io/date/1795176000.svg?label=2026-11-20)
+
+Final release of the 0.3 series: compatibility fixes for current dependency versions, without API changes.
+The next release, 0.4.0, moves to scipy sparse arrays and has breaking changes.
+
+### Dependencies
+* Packaging moved from `setup.py` to `pyproject.toml` with the `hatchling` build backend.
+* `requirements.txt` pins a known-good environment.
+* hyperopt 0.3 (removes the `pkg_resources` dependency).
+* Supports numpy 2 and Python 3.11 to 3.14. Requires Python >= 3.11, numpy >= 2.0, scipy >= 1.13,
+  scikit-learn >= 1.4.2, pandas >= 2.2.2 and torch >= 2.3.
+
+### Bugfixes
+* __datasets__
+    * `RecsysChallenge2015`: timestamps with and without fractional seconds are parsed explicitly.
+* __algorithms__
+    * Top-K selection (`get_top_K_values`) breaks ties deterministically, as documented:
+      ties for the last position go to the largest column index.
+    * `Prod2VecClustered` sets `KMeans(n_init=10)` explicitly; scikit-learn 1.4 changed the default.
+    * Torch models are loaded with `torch.load(weights_only=False)`; torch 2.6 changed the default.
+    * Replaced the sparse `.A` attribute (removed in scipy 1.14) with `.toarray()`.
+    * Replaced `np.product` and `np.NAN`, removed in numpy 2.
+
+### Development
+* CI moved from GitLab CI to GitHub Actions and runs on pull requests.
+
 ## [0.3.6] - ![](https://img.shields.io/date/1702314586.svg?label=2023-12-1)
 
 ## Dependencies

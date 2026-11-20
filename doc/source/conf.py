@@ -23,7 +23,7 @@ copyright = "2020, Froomle"
 author = "Lien Michiels and Robin Verachtert"
 
 # The full version, including alpha/beta/rc tags
-release = "0.3.0"
+release = "0.3.7"
 
 
 # -- General configuration ---------------------------------------------------
