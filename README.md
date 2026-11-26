@@ -8,6 +8,11 @@ All released versions of recpack are published on [Pypi](https://pypi.org/projec
 
 `pip install recpack`
 
+The PyTorch-based algorithms (`BPRMF`, `MultVAE`, `RecVAE`, `WeightedMatrixFactorization`, `Prod2Vec`,
+`Prod2VecClustered` and the `GRU4Rec` variants) need [PyTorch](https://pytorch.org/), which is an optional extra:
+
+`pip install 'recpack[torch]'`
+
 ## Documentation
 Documentation and tutorials can be found at https://recpack.froomle.ai
 

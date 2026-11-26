@@ -7,6 +7,25 @@ _Maintainer | Robin Verachtert | robin.verachtert@froomle.com_
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Breaking changes
+* __PyTorch is an optional dependency__: `pip install recpack` no longer installs torch.
+  Install `pip install 'recpack[torch]'` to use the PyTorch-based algorithms
+  (`BPRMF`, `MultVAE`, `RecVAE`, `WeightedMatrixFactorization`, `Prod2Vec`, `Prod2VecClustered`,
+  `GRU4Rec`, `GRU4RecNegSampling`, `GRU4RecCrossEntropy`) and `TorchMLAlgorithm`.
+  Without torch, accessing one of these raises an `ImportError` that says how to install it.
+  Everything else (datasets, scenarios, the other algorithms, metrics, pipelines) works without torch.
+
+### Changes
+* `TorchMLAlgorithm` moved from `recpack.algorithms.base` to `recpack.algorithms.torch_base`,
+  and `swish`, `log_norm_pdf`, `naive_sparse2tensor` and `naive_tensor2sparse` moved from
+  `recpack.algorithms.util` to `recpack.algorithms.torch_util`.
+  The old import paths still work.
+
+### Development
+* CI runs the test suite once more without torch installed; tests that need torch are skipped there.
+
 ## [0.4.0] - ![](https://img.shields.io/date/1795089600.svg?label=2026-11-19)
 
 This release modernises RecPack's dependencies and moves to the array-based APIs of numpy and scipy.

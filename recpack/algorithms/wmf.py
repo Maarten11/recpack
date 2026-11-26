@@ -15,7 +15,8 @@ from tqdm.auto import tqdm
 import torch
 
 from recpack.algorithms import Algorithm
-from recpack.algorithms.util import naive_sparse2tensor, get_batches, get_users
+from recpack.algorithms.torch_util import naive_sparse2tensor
+from recpack.algorithms.util import get_batches, get_users
 from recpack.matrix import to_binary
 
 logger = logging.getLogger("recpack")

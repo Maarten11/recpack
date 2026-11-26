@@ -9,11 +9,30 @@ import numpy as np
 import pandas as pd
 import pytest
 from scipy.sparse import csr_array
-import torch
-import torch.nn as nn
 
 
 from recpack.matrix import InteractionMatrix
+
+try:
+    import torch
+except ImportError:
+    # torch is an optional extra. Without it, skip the test files that need it.
+    collect_ignore = [
+        "test_algorithms_base.py",
+        "test_algorithms_util.py",
+        "test_bprmf.py",
+        "test_gru4rec_crossentropy.py",
+        "test_gru4rec_neg_sampling.py",
+        "test_loss_functions.py",
+        "test_mult_vae.py",
+        "test_p2v.py",
+        "test_p2v_clustered.py",
+        "test_p2v_distribution.py",
+        "test_rec_vae.py",
+        "test_samplers.py",
+        "test_wmf.py",
+        "util.py",
+    ]
 
 
 USER_IX = InteractionMatrix.USER_IX
@@ -78,5 +97,5 @@ def p2v_embedding():
     ]
     embedding = np.array(embedding)
     embedding = torch.from_numpy(embedding)
-    embedding = nn.Embedding.from_pretrained(embedding)
+    embedding = torch.nn.Embedding.from_pretrained(embedding)
     return embedding

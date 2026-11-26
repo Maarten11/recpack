@@ -21,7 +21,11 @@ from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
-import torch
+
+try:
+    import torch
+except ImportError:  # torch is an optional extra since RecPack 0.5
+    torch = None
 from scipy.sparse import csr_array, csr_matrix, issparse
 
 from recpack import algorithms, datasets, metrics, scenarios
@@ -86,6 +90,17 @@ def to_array(x) -> np.ndarray:
 
 K = 10
 TORCH_KWARGS = dict(max_epochs=2, seed=SEED, stop_early=False)
+# Algorithm cases that need torch; skipped when it is not installed.
+REQUIRES_TORCH = {
+    "WeightedMatrixFactorization",
+    "BPRMF",
+    "MultVAE",
+    "RecVAE",
+    "Prod2Vec",
+    "Prod2VecClustered",
+    "GRU4RecNegSampling",
+    "GRU4RecCrossEntropy",
+}
 
 ALGORITHMS: Dict[str, Callable[[], algorithms.Algorithm]] = {
     # K=11: at K=10 two items tie for the last place, which Popularity breaks differently per platform.
@@ -149,10 +164,11 @@ def run_algorithm(name: str) -> Outputs:
     # SLIM (SGDRegressor) and WeightedMatrixFactorization have no seed parameter
     # and use the global random state.
     np.random.seed(SEED)
-    torch.manual_seed(SEED)
+    if torch is not None:
+        torch.manual_seed(SEED)
     data = make_data()
     algo = ALGORITHMS[name]()
-    if isinstance(algo, algorithms.TorchMLAlgorithm):
+    if torch is not None and isinstance(algo, algorithms.TorchMLAlgorithm):
         algo.fit(data, (data, data))
     elif isinstance(algo, EASE_XY):
         algo.fit(data, data)

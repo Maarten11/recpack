@@ -11,12 +11,25 @@ from typing import Callable
 import numpy as np
 from scipy.sparse import csr_array
 
-from recpack.algorithms.loss_functions import bpr_loss_wrapper, warp_loss_wrapper
 from recpack.metrics.dcg import ndcg_k
 from recpack.metrics.recall import recall_k
 from recpack.metrics.precision import precision_k
 
 logger = logging.getLogger("recpack")
+
+
+# The BPR and WARP losses need torch. Import them when they are called, so this module
+# (and the metric-based criteria) work without torch installed.
+def bpr_loss_wrapper(*args, **kwargs):
+    from recpack.algorithms.loss_functions import bpr_loss_wrapper
+
+    return bpr_loss_wrapper(*args, **kwargs)
+
+
+def warp_loss_wrapper(*args, **kwargs):
+    from recpack.algorithms.loss_functions import warp_loss_wrapper
+
+    return warp_loss_wrapper(*args, **kwargs)
 
 
 class StoppingCriterion:

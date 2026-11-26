@@ -16,9 +16,10 @@ import torch.optim as optim
 from scipy.sparse import csr_array
 import numpy as np
 
-from recpack.algorithms.base import TorchMLAlgorithm
+from recpack.algorithms.torch_base import TorchMLAlgorithm
 from recpack.algorithms.loss_functions import vae_loss
-from recpack.algorithms.util import naive_sparse2tensor, get_batches
+from recpack.algorithms.torch_util import naive_sparse2tensor
+from recpack.algorithms.util import get_batches
 
 logger = logging.getLogger("recpack")
 
