@@ -17,7 +17,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-from recpack.algorithms.base import TorchMLAlgorithm
+from recpack.algorithms.torch_base import TorchMLAlgorithm
 from recpack.algorithms.loss_functions import bpr_loss
 from recpack.algorithms.samplers import BootstrapSampler
 

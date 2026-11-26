@@ -8,6 +8,7 @@
 import pytest
 
 from recpack.pipelines.registries import ALGORITHM_REGISTRY, METRIC_REGISTRY
+from recpack.tests.markers import requires_torch
 
 
 def test_metric_registry():
@@ -16,6 +17,7 @@ def test_metric_registry():
     assert "NDCGK" in METRIC_REGISTRY
 
 
+@requires_torch
 def test_algorithm_registry():
     assert "ItemKNN" in ALGORITHM_REGISTRY
     assert "MultVAE" in ALGORITHM_REGISTRY

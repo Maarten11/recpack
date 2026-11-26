@@ -231,6 +231,14 @@ Use these to simplify certain tasks (such as batching) when creating a new algor
 
     get_batches
     sample_rows
+
+.. currentmodule:: recpack.algorithms.torch_util
+
+The ``torch_util`` module contains helpers for PyTorch-based algorithms (requires the ``torch`` extra).
+
+.. autosummary::
+    :toctree: generated/
+
     naive_sparse2tensor
     naive_tensor2sparse
 """
@@ -239,7 +247,6 @@ Use these to simplify certain tasks (such as batching) when creating a new algor
 from recpack.algorithms.base import (
     Algorithm,
     TopKItemSimilarityMatrixAlgorithm,
-    TorchMLAlgorithm,
     ItemSimilarityMatrixAlgorithm,
     FactorizationAlgorithm,
 )
@@ -257,21 +264,8 @@ from recpack.algorithms.slim import SLIM
 
 from recpack.algorithms.nearest_neighbour import ItemKNN, ItemPNN
 from recpack.algorithms.kunn import KUNN
-from recpack.algorithms.bprmf import BPRMF
 
 # from recpack.algorithms.metric_learning.cml import CML
-
-from recpack.algorithms.mult_vae import MultVAE
-from recpack.algorithms.rec_vae import RecVAE
-from recpack.algorithms.wmf import WeightedMatrixFactorization
-
-from recpack.algorithms.p2v import Prod2Vec
-from recpack.algorithms.p2v_clustered import Prod2VecClustered
-from recpack.algorithms.gru4rec import (
-    GRU4Rec,
-    GRU4RecNegSampling,
-    GRU4RecCrossEntropy,
-)
 
 from recpack.algorithms.stan import STAN
 from recpack.algorithms.time_aware_item_knn import (
@@ -287,3 +281,41 @@ from recpack.algorithms.time_aware_item_knn import (
 )
 
 from recpack.algorithms.sequential_rules import SequentialRules
+
+
+# Algorithms that need PyTorch (the optional ``torch`` extra). They are imported on first access,
+# so ``import recpack.algorithms`` works without torch installed.
+_TORCH_ALGORITHMS = {
+    "TorchMLAlgorithm": "recpack.algorithms.torch_base",
+    "BPRMF": "recpack.algorithms.bprmf",
+    "MultVAE": "recpack.algorithms.mult_vae",
+    "RecVAE": "recpack.algorithms.rec_vae",
+    "WeightedMatrixFactorization": "recpack.algorithms.wmf",
+    "Prod2Vec": "recpack.algorithms.p2v",
+    "Prod2VecClustered": "recpack.algorithms.p2v_clustered",
+    "GRU4Rec": "recpack.algorithms.gru4rec",
+    "GRU4RecNegSampling": "recpack.algorithms.gru4rec",
+    "GRU4RecCrossEntropy": "recpack.algorithms.gru4rec",
+}
+
+
+def __getattr__(name):
+    if name not in _TORCH_ALGORITHMS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    import importlib
+
+    try:
+        module = importlib.import_module(_TORCH_ALGORITHMS[name])
+    except ModuleNotFoundError as e:
+        if e.name != "torch":
+            raise
+        raise ImportError(
+            f"{name} requires PyTorch, which is not installed. Install it with: pip install 'recpack[torch]'"
+        ) from e
+    value = getattr(module, name)
+    globals()[name] = value  # cache, so later lookups skip __getattr__
+    return value
+
+
+def __dir__():
+    return sorted(list(globals()) + list(_TORCH_ALGORITHMS))

@@ -14,10 +14,9 @@ import warnings
 
 import numpy as np
 
-from recpack.algorithms.base import TorchMLAlgorithm
 from recpack.matrix import InteractionMatrix
 from recpack.pipelines.hyperparameter_optimisation import OptimisationInfo, GridSearchInfo
-from recpack.pipelines.pipeline import Pipeline
+from recpack.pipelines.pipeline import Pipeline, _is_torch_algorithm
 from recpack.pipelines.registries import (
     ALGORITHM_REGISTRY,
     METRIC_REGISTRY,
@@ -305,7 +304,7 @@ class PipelineBuilder(object):
 
     def _requires_validation_data(self) -> bool:
         return any([algo.optimise for algo in self.algorithm_entries]) or any(
-            [issubclass(ALGORITHM_REGISTRY.get(algo.name), TorchMLAlgorithm) for algo in self.algorithm_entries]
+            [_is_torch_algorithm(ALGORITHM_REGISTRY.get(algo.name)) for algo in self.algorithm_entries]
         )
 
     def build(self) -> Pipeline:

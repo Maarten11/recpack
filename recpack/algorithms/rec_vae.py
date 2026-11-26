@@ -16,8 +16,9 @@ import torch.nn.functional as F
 import torch
 import torch.optim as optim
 
-from recpack.algorithms.base import TorchMLAlgorithm
-from recpack.algorithms.util import swish, log_norm_pdf, naive_sparse2tensor, get_batches
+from recpack.algorithms.torch_base import TorchMLAlgorithm
+from recpack.algorithms.torch_util import swish, log_norm_pdf, naive_sparse2tensor
+from recpack.algorithms.util import get_batches
 
 
 logger = logging.getLogger("recpack")

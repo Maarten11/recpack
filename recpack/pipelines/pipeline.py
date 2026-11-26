@@ -8,6 +8,7 @@
 from collections import defaultdict
 import logging
 import os
+import sys
 from typing import Tuple, Union, Dict, List, Any, Optional, Callable
 
 from hyperopt import Trials, fmin, tpe, space_eval, STATUS_OK
@@ -15,7 +16,7 @@ import pandas as pd
 from scipy.sparse import csr_array
 from tqdm.auto import tqdm
 
-from recpack.algorithms.base import Algorithm, TorchMLAlgorithm
+from recpack.algorithms.base import Algorithm
 from recpack.matrix import InteractionMatrix
 from recpack.pipelines.registries import (
     ALGORITHM_REGISTRY,
@@ -29,6 +30,19 @@ from recpack.postprocessing.postprocessors import Postprocessor
 
 
 logger = logging.getLogger("recpack")
+
+
+def _is_torch_algorithm(algorithm: Union[Algorithm, type]) -> bool:
+    """Check if an algorithm (instance or class) is a :class:`TorchMLAlgorithm`, without importing torch.
+
+    A TorchMLAlgorithm subclass can only exist once ``recpack.algorithms.torch_base`` is imported.
+    If that module is not loaded, the algorithm can't be one.
+    """
+    torch_base = sys.modules.get("recpack.algorithms.torch_base")
+    if torch_base is None:
+        return False
+    cls = algorithm if isinstance(algorithm, type) else type(algorithm)
+    return issubclass(cls, torch_base.TorchMLAlgorithm)
 
 
 class MetricAccumulator:
@@ -143,7 +157,7 @@ class Pipeline(object):
 
             algorithm = ALGORITHM_REGISTRY.get(algorithm_entry.name)(**params)
             # Train the final version of the algorithm
-            if isinstance(algorithm, TorchMLAlgorithm):
+            if _is_torch_algorithm(algorithm):
                 # TODO In theory, if early stopping is not used, this could be the full training dataset.
                 self._train(algorithm, self.validation_training_data)
             else:
@@ -161,7 +175,7 @@ class Pipeline(object):
                 self._metric_acc.add(metric, algorithm.identifier, metric.name)
 
     def _train(self, algorithm: Algorithm, training_data: InteractionMatrix) -> Algorithm:
-        if isinstance(algorithm, TorchMLAlgorithm):
+        if _is_torch_algorithm(algorithm):
             algorithm.fit(training_data, self.validation_data)
         else:
             algorithm.fit(training_data)

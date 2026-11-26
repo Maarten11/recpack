@@ -30,10 +30,36 @@ jobs:
         run: pip install torch --index-url https://download.pytorch.org/whl/cpu
 
       - name: Install recpack with test dependencies
-        run: pip install -e '.[test]'
+        run: pip install -e '.[torch,test]'
 
       - name: Run tests
         run: pytest --cov=recpack recpack/tests/ --cov-config=.coveragerc --cov-report=term
+
+  test-without-torch:
+    # torch is an optional extra: check that the rest of RecPack installs and works without it.
+    name: Tests without torch (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.15"]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install recpack with test dependencies (no torch)
+        run: pip install -e '.[test]'
+
+      - name: Check that torch is not installed
+        run: python -c "import importlib.util, sys; sys.exit(importlib.util.find_spec('torch') is not None)"
+
+      - name: Run tests
+        # Tests that need torch are skipped.
+        run: pytest recpack/tests/
 
   notebooks:
     name: Example notebooks
@@ -51,7 +77,7 @@ jobs:
 
       - name: Install recpack, test dependencies and jupyter
         # The NeuMF notebook imports pytest.
-        run: pip install -e '.[test]' jupyter
+        run: pip install -e '.[torch,test]' jupyter
 
       - name: Run notebooks
         working-directory: examples

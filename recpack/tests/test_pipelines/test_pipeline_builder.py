@@ -16,6 +16,7 @@ from recpack.pipelines import PipelineBuilder
 from recpack.pipelines.hyperparameter_optimisation import GridSearchInfo, HyperoptInfo
 from recpack.postprocessing.filters import ExcludeItems
 from recpack.scenarios import Timed
+from recpack.tests.markers import requires_torch
 
 
 
@@ -49,6 +50,7 @@ def test_pipeline_builder_no_algos(mat):
     assert error.value.args[0] == "No algorithms specified, can't construct pipeline"
 
 
+@requires_torch
 def test_pipeline_builder_add_algos_correct(mat):
     pb = PipelineBuilder()
     assert pb.base_path == os.getcwd()
@@ -75,7 +77,9 @@ def test_pipeline_builder_add_algos_correct(mat):
     [
         ("ItemKNN", HyperoptInfo({"K": [10, 20, 50, 100]}, max_evals=2), None),
         ("ItemKNN", GridSearchInfo({"K": [10, 20, 50, 100]}), None),
-        ("Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}),
+        pytest.param(
+            "Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}, marks=requires_torch
+        ),
     ],
 )
 def test_pipeline_builder_no_optimisation_metric(mat, algo_name, optimisation_info, params):
@@ -98,7 +102,9 @@ def test_pipeline_builder_no_optimisation_metric(mat, algo_name, optimisation_in
     [
         ("ItemKNN", HyperoptInfo({"K": [10, 20, 50, 100]}, max_evals=2), None),
         ("ItemKNN", GridSearchInfo({"K": [10, 20, 50, 100]}), None),
-        ("Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}),
+        pytest.param(
+            "Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}, marks=requires_torch
+        ),
     ],
 )
 def test_pipeline_builder_no_data(mat, algo_name, optimisation_info, params):
@@ -121,7 +127,9 @@ def test_pipeline_builder_no_data(mat, algo_name, optimisation_info, params):
     [
         ("ItemKNN", HyperoptInfo({"K": [10, 20, 50, 100]}, max_evals=2), None),
         ("ItemKNN", GridSearchInfo({"K": [10, 20, 50, 100]}), None),
-        ("Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}),
+        pytest.param(
+            "Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}, marks=requires_torch
+        ),
     ],
 )
 def test_pipeline_builder_no_test_data(mat, algo_name, optimisation_info, params):
@@ -146,7 +154,9 @@ def test_pipeline_builder_no_test_data(mat, algo_name, optimisation_info, params
     [
         ("ItemKNN", HyperoptInfo({"K": [10, 20, 50, 100]}, max_evals=2), None),
         ("ItemKNN", GridSearchInfo({"K": [10, 20, 50, 100]}), None),
-        ("Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}),
+        pytest.param(
+            "Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}, marks=requires_torch
+        ),
     ],
 )
 def test_pipeline_builder_no_validation_data(mat, algo_name, optimisation_info, params):
@@ -174,6 +184,7 @@ def test_pipeline_builder_no_validation_data(mat, algo_name, optimisation_info, 
     )
 
 
+@requires_torch
 def test_pipeline_builder_no_validation_torch(pipeline_builder):
     pipeline_builder.add_algorithm("BPRMF", params={"learning_rate": 0.1})
 
@@ -204,7 +215,9 @@ def test_pipeline_builder_no_optimisation(mat):
     [
         ("ItemKNN", HyperoptInfo({"K": [10, 20, 50, 100]}, max_evals=2), None),
         ("ItemKNN", GridSearchInfo({"K": [10, 20, 50, 100]}), None),
-        ("Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}),
+        pytest.param(
+            "Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}, marks=requires_torch
+        ),
     ],
 )
 def test_pipeline_builder_no_validation_training_data(mat, algo_name, optimisation_info, params):
@@ -241,7 +254,9 @@ def test_pipeline_builder_no_validation_training_data(mat, algo_name, optimisati
     [
         ("ItemKNN", HyperoptInfo({"K": [10, 20, 50, 100]}, max_evals=2), None),
         ("ItemKNN", GridSearchInfo({"K": [10, 20, 50, 100]}), None),
-        ("Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}),
+        pytest.param(
+            "Prod2Vec", GridSearchInfo({"num_components": [10, 20]}), {"learning_rate": 0.1}, marks=requires_torch
+        ),
     ],
 )
 def test_pipeline_builder_full_success(mat, algo_name, optimisation_info, params):

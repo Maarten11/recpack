@@ -11,7 +11,7 @@ purpose, regenerate the snapshots (see ``generate_snapshots.py``) and explain wh
 import numpy as np
 import pytest
 
-from recpack.tests.test_regression.cases import CASES
+from recpack.tests.test_regression.cases import CASES, REQUIRES_TORCH, torch
 from recpack.tests.test_regression.generate_snapshots import SNAPSHOT_FILE
 
 RTOL = 1e-6
@@ -52,6 +52,8 @@ def test_every_snapshot_has_a_case(snapshots):
 
 @pytest.mark.parametrize("case", list(CASES))
 def test_snapshot(case, snapshots):
+    if torch is None and case.removeprefix("algorithm/") in REQUIRES_TORCH:
+        pytest.skip("requires torch")
     outputs = CASES[case]()
     expected_keys = {key.rsplit("/", 1)[1] for key in snapshots if key.rsplit("/", 1)[0] == case}
     assert set(outputs) == expected_keys

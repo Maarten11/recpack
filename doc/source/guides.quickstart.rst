@@ -9,6 +9,13 @@ The latest version can be installed from `Pypi <https://pypi.org/project/recpack
 
     pip install --upgrade recpack
 
+The PyTorch-based algorithms (:class:`recpack.algorithms.BPRMF`, :class:`recpack.algorithms.MultVAE`,
+:class:`recpack.algorithms.RecVAE`, :class:`recpack.algorithms.WeightedMatrixFactorization`,
+:class:`recpack.algorithms.Prod2Vec`, :class:`recpack.algorithms.Prod2VecClustered`
+and the GRU4Rec variants) need PyTorch. Install it with the ``torch`` extra: ::
+
+    pip install --upgrade 'recpack[torch]'
+
 
 Basic Usage
 -----------
